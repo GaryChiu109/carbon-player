@@ -90,3 +90,30 @@ import os
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
     app.run(host='0.0.0.0', port=port)
+
+import requests
+import json
+# 設定 headers，輸入你的 Access Token，記得前方要加上「Bearer 」( 有一個空白 )
+headers = {'Authorization':'Bearer 你的 uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYucEHjaZKRXgAVnYvk3DfMhcsF60/iA6NxzaKgo0SPOb/yn7xLZxmTfzegtqB2J1na74r8SAo2aZCuBsw/+pdnfCLolxSvvD+6lwdB04t89/1O/w1cDnyilFU=','Content-Type':'application/json'}
+
+body = {
+    'size': {'width': 1080, 'height': 360},   # 設定尺寸
+    'selected': 'true',                        # 預設是否顯示
+    'name': 'Menu',                   # 選單名稱
+    'chatBarText': 'Menu',            # 選單在 LINE 顯示的標題
+    'areas':[                                  # 選單內容
+        {
+          'bounds': {'x': 0, 'y': 720, 'width': 360, 'height': 360}, # 選單位置與大小
+          'action': {'type': 'message', 'text': '為您提供氣候變遷資訊 \n '}                # 點擊後傳送文字
+        },
+        {
+          'bounds': {'x': 360, 'y': 720, 'width': 360, 'height': 360},
+          'action': {'type': 'uri', 'text': 'https://www.climatecentral.org/'}
+        }
+    ]
+  }
+# 向指定網址發送 request
+req = requests.request('POST', 'https://api.line.me/v2/bot/richmenu',
+                      headers=headers,data=json.dumps(body).encode('utf-8'))
+# 印出得到的結果
+print(req.text)
