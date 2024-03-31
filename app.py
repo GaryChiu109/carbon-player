@@ -46,14 +46,46 @@ def callback():
 
 # 氣象功能
 def reply_weather_image(reply_token):
-    image_url = 'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png'
-    line_bot_api.reply_message(
-        reply_token,
-        ImageSendMessage(
-            original_content_url = image_url,
-            preview_image_url = image_url
-        )
-    )
+    #image_url = 'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png'
+    #line_bot_api.reply_message(
+        #reply_token,
+        #ImageSendMessage(
+            #original_content_url = image_url,
+            #preview_image_url = image_url
+        #)
+    #)
+
+
+    access_token = 'uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYucEHjaZKRXgAVnYvk3DfMhcsF60/iA6NxzaKgo0SPOb/yn7xLZxmTfzegtqB2J1na74r8SAo2aZCuBsw/+pdnfCLolxSvvD+6lwdB04t89/1O/w1cDnyilFU='
+    url = 'https://api.line.me/v2/bot/message/push'
+    headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + access_token
+    }
+
+    radar_url = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0058-003?Authorization=rdec-key-123-45678-011121314&format=JSON'
+    radar = requests.get(radar_url)
+    radar_json = radar.json()
+    radar_img = radar_json['cwaopendata']['dataset']['resource']['ProductURL']
+    radar_time = radar_json['cwaopendata']['dataset']['DateTime'] 
+
+    data = {
+            'to': reply_token,
+            'messages': [
+                {
+                    'type': 'text',
+                    'text': 'Check out the radar image for potential rain!'
+                },
+                {
+                    'type': 'image',
+                    'originalContentUrl': radar_img + '?' + radar_time,
+                    'previewImageUrl': radar_img + '?' + radar_time
+                }
+            ]
+        }
+    response = requests.post(url, headers=headers, json=data)
+
+
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
