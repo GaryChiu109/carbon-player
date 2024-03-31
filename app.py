@@ -64,15 +64,14 @@ def reply_weather_image(reply_token):
     radar_img = radar_json['cwaopendata']['dataset']['resource']['ProductURL']
     radar_time = radar_json['cwaopendata']['dataset']['DateTime'] 
 
-    message = [
-        TextSendMessage(text='Check out the radar image for potential rain!'),
-        {
-            "type": "image",
-            "originalContentUrl": radar_img + '?' + radar_time,
-            "previewImageUrl": radar_img + '?' + radar_time
-        }
-    ]
-    line_bot_api.reply_message(reply_token, message)
+    line_bot_api.reply_message(
+        reply_token,
+        ImageSendMessage(
+            original_content_url = radar_img,
+            preview_image_url = radar_img
+        )
+    )
+
 
 
 # 處理訊息
