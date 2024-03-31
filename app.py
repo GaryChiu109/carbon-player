@@ -44,13 +44,29 @@ def callback():
         abort(400)
     return 'OK'
 
+# 氣象功能
+def reply_weather_image(reply_token):
+    image_url = 'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png'
+    line_bot_api.reply_message(
+        reply_token,
+        ImageSendMessage(
+            original_content_url = image_url,
+            preview_image_url = image_url
+        )
+    )
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     msg= event.message.text
-    message = TextSendMessage(text=msg)
-    line_bot_api.reply_message(event.reply_token,message)
+    if msg == '雷達回波圖' or msg == '雷達回波':
+        reply_weather_image(event.reply_token)
+    else:
+        message = TextSendMessage(text=msg)
+        line_bot_api.reply_message(event.reply_token, message)
+
+    # message = TextSendMessage(text=msg)
+    # line_bot_api.reply_message(event.reply_token,message)
     
     # if '最新合作廠商' in msg:
     #     message = imagemap_message()
