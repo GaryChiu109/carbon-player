@@ -28,6 +28,8 @@ line_bot_api = LineBotApi('uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYuc
 # Channel Secret
 handler = WebhookHandler('fed72a71f8981ef1dec1e5867df85909')
 
+# Define a static folder for storing temporary files
+static_tmp_path = './static/tmp'
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -47,7 +49,7 @@ def callback():
 access_token = 'uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYucEHjaZKRXgAVnYvk3DfMhcsF60/iA6NxzaKgo0SPOb/yn7xLZxmTfzegtqB2J1na74r8SAo2aZCuBsw/+pdnfCLolxSvvD+6lwdB04t89/1O/w1cDnyilFU='
 
 
-# 雷達回波圖
+# Radar image
 def reply_weather_image(reply_token):
     radar_url = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0058-003?Authorization=rdec-key-123-45678-011121314&format=JSON'
     radar = requests.get(radar_url)
@@ -63,6 +65,60 @@ def reply_weather_image(reply_token):
         )
     )
 
+# Current weather
+def current_weather(address):
+    city_list, area_list, area_list2 = {}, {}, {}
+    msg = '找不到氣象資。'
+    def get_data(url):
+        w_data = requests.get(url)
+        w_data_json = w_data.json()
+        location = w_data_json['cwbopendata']['location']
+        for i in location:
+            name = i['locationName']
+            city = i['parameter'][0]['parameterValue']
+            area = i['parameter'][2]['parameterValue']
+            temp = check_data(i['weatherElement'][3]['elementValue']['value'])
+            humd = check_data(round(float(i['weatherElement'][4]['elementValue']['value'])*100, 1))
+            r24 = check_data(i['weatherElement'][6]['elementValue']['value'])
+            if area not in area_list:
+                are_list[area] = {'temp':temp, 'humd':humd, 'r24':r24}
+            if city not in city_list:
+                city_list[city] = {'temp':temp, 'humd':[], 'r24':[]}
+            city_list[city]['temp'].append(temp)
+            city_list[city]['humd'].append(humd)
+            city_list[city]['r24'].append(r24)
+
+    def check_data(e):
+        return False if float(e)<0 else float(e)
+
+    def msg_content(loc, msg):
+        a = msg
+        for i in loc:
+            if i in address:
+                temp = f"氣溫 {loc[i]['temp']} 度，" if loc[i]['temp'] != False else ''
+                humd = f"相對濕度 {loc[i]['humd']}%，" if loc[i]['humd'] != False else ''
+                r24 = f"累積雨量 {loc[i]['r24']}mm" if loc[i]['r24'] != False else ''
+                description = f'{temp}{humd}{r24}'.strip('，')
+                a = f'{description}。'
+                break
+        return a
+
+    try:
+        code = '你的氣象資料授權碼'
+        get_data(f'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0001-001?Authorization={code}&downloadType=WEB&format=JSON')
+        get_data(f'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0003-001?Authorization={code}&downloadType=WEB&format=JSON')
+
+        for i in city_list:
+            if i not in area_list2:
+                area_list2[i] = {'temp':round(statistics.mean(city_list[i]['temp']),1),
+                                'humd':round(statistics.mean(city_list[i]['humd']),1),
+                                'r24':round(statistics.mean(city_list[i]['r24']),1)
+                                }
+        msg = msg_content(area_list2, msg)
+        msg = msg_content(area_list, msg)
+        return msg
+    except:
+        return msg
 
 
 # 處理訊息
@@ -71,34 +127,13 @@ def handle_message(event):
     msg= event.message.text
     if msg == '雷達回波圖' or msg == '雷達回波':
         reply_weather_image(event.reply_token)
+    elif '台' in msg or '臺' in msg:
+        weather_forecast = current_weather(msg)
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=weather_forecast))
     else:
         message = TextSendMessage(text=msg)
         line_bot_api.reply_message(event.reply_token, message)
 
-    # message = TextSendMessage(text=msg)
-    # line_bot_api.reply_message(event.reply_token,message)
-    
-    # if '最新合作廠商' in msg:
-    #     message = imagemap_message()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # elif '最新活動訊息' in msg:
-    #     message = buttons_message()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # elif '註冊會員' in msg:
-    #     message = Confirm_Template()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # elif '旋轉木馬' in msg:
-    #     message = Carousel_Template()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # elif '圖片畫廊' in msg:
-    #     message = test()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # elif '功能列表' in msg:
-    #     message = function_list()
-    #     line_bot_api.reply_message(event.reply_token, message)
-    # else:
-    #     message = TextSendMessage(text=msg)
-    #     line_bot_api.reply_message(event.reply_token, message)
 
 @handler.add(PostbackEvent)
 def handle_message(event):
@@ -113,7 +148,7 @@ def welcome(event):
     name = profile.display_name
     message = TextSendMessage(text=f'{name}歡迎加入')
     line_bot_api.reply_message(event.reply_token, message)
-        
+
         
 import os
 if __name__ == "__main__":
