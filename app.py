@@ -46,17 +46,8 @@ def callback():
 
 access_token = 'uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYucEHjaZKRXgAVnYvk3DfMhcsF60/iA6NxzaKgo0SPOb/yn7xLZxmTfzegtqB2J1na74r8SAo2aZCuBsw/+pdnfCLolxSvvD+6lwdB04t89/1O/w1cDnyilFU='
 
-# 氣象功能
-#def reply_weather_image(reply_token):
-    #image_url = 'https://cwbopendata.s3.ap-northeast-1.amazonaws.com/MSC/O-A0058-003.png'
-    #line_bot_api.reply_message(
-        #reply_token,
-        #ImageSendMessage(
-            #original_content_url = image_url,
-            #preview_image_url = image_url
-        #)
-    #)
 
+# 雷達回波圖
 def reply_weather_image(reply_token):
     radar_url = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0058-003?Authorization=rdec-key-123-45678-011121314&format=JSON'
     radar = requests.get(radar_url)
