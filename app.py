@@ -81,7 +81,7 @@ def current_weather(address):
             humd = check_data(round(float(i['weatherElement'][4]['elementValue']['value'])*100, 1))
             r24 = check_data(i['weatherElement'][6]['elementValue']['value'])
             if area not in area_list:
-                are_list[area] = {'temp':temp, 'humd':humd, 'r24':r24}
+                area_list[area] = {'temp':temp, 'humd':humd, 'r24':r24}
             if city not in city_list:
                 city_list[city] = {'temp':temp, 'humd':[], 'r24':[]}
             city_list[city]['temp'].append(temp)
