@@ -74,9 +74,9 @@ def handle_message(event):
     msg= event.message.text
     if msg == '雷達回波圖' or msg == '雷達回波':
         reply_weather_image(event.reply_token)
-    elif '台' in msg or '臺' in msg:
-        weather_forecast = current_weather(msg)
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=weather_forecast))
+    #elif '台' in msg or '臺' in msg:
+    #    weather_forecast = current_weather(msg)
+    #    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=weather_forecast))
     else:
         message = TextSendMessage(text=msg)
         line_bot_api.reply_message(event.reply_token, message)
