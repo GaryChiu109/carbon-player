@@ -77,9 +77,9 @@ def handle_message(event):
     #elif '台' in msg or '臺' in msg:
     #    weather_forecast = current_weather(msg)
     #    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=weather_forecast))
-    else:
-        message = TextSendMessage(text=msg)
-        line_bot_api.reply_message(event.reply_token, message)
+    #else:
+    #    message = TextSendMessage(text=msg)
+    #    line_bot_api.reply_message(event.reply_token, message)
 
 
 @handler.add(PostbackEvent)
