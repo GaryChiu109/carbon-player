@@ -47,8 +47,7 @@ def linebot():
             if json_data['events'][0]['message']['type'] == 'location':
                 address = json_data['events'][0]['message']['address'].replace('台','臺')
                 # 回覆爬取到的相關氣象資訊
-                reply_message(f'{address}\n\n{current_weather(address)}', reply_token, access_token)
-                print(address)
+                reply_message(f'{address}\n\n{aqi(address)}\n\n{current_weather(address)}\n\n{forecast(address)}', reply_token, access_token) # 回覆爬取到的相關氣象資訊
             if json_data['events'][0]['message']['type'] == 'text':
                 text = json_data['events'][0]['message']['text']
                 if text == '雷達回波圖' or text == '雷達回波':
