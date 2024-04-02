@@ -22,14 +22,11 @@ import time
 #======python的函數庫==========
 
 app = Flask(__name__)
-static_tmp_path = os.path.join(os.path.dirname(__file__), 'static', 'tmp')
 # Channel Access Token
 line_bot_api = LineBotApi('uyT/wIyH6kkz35o7X7G8Edzgisq8l4Vn1wTvz+QMXcuKAnaXUhYucEHjaZKRXgAVnYvk3DfMhcsF60/iA6NxzaKgo0SPOb/yn7xLZxmTfzegtqB2J1na74r8SAo2aZCuBsw/+pdnfCLolxSvvD+6lwdB04t89/1O/w1cDnyilFU=')
 # Channel Secret
 handler = WebhookHandler('fed72a71f8981ef1dec1e5867df85909')
 
-# Define a static folder for storing temporary files
-static_tmp_path = './static/tmp'
 
 # 監聽所有來自 /callback 的 Post Request
 @app.route("/callback", methods=['POST'])
@@ -113,7 +110,7 @@ def current_weather(address):
 
     try:
         # 因為目前天氣有兩組網址，兩組都爬取
-        code = '你的氣象資料授權碼'
+        code = 'CWA-371EFA85-E086-45AE-B068-E449E4478D6A'
         get_data(f'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0001-001?Authorization={code}&downloadType=WEB&format=JSON')
         get_data(f'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0003-001?Authorization={code}&downloadType=WEB&format=JSON')
 
@@ -135,7 +132,6 @@ def current_weather(address):
 def handle_message(event):
     msg= event.message.text
     if msg == '雷達回波圖' or msg == '雷達回波' or msg == 'radar':
-        #print('yes')
         reply_weather_image(event.reply_token)
     elif '台' in msg or '臺' in msg:
         weather_forecast = current_weather(msg)
@@ -143,9 +139,6 @@ def handle_message(event):
     else:
         message = TextSendMessage(text=msg)
         line_bot_api.reply_message(event.reply_token, message)
-
-
-
 
 
 @handler.add(PostbackEvent)
