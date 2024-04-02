@@ -72,7 +72,7 @@ def reply_weather_image(reply_token):
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     msg= event.message.text
-    if msg == '雷達回波圖' or msg == '雷達回波':
+    if msg == '雷達回波圖' or msg == '雷達回波' or msg == 'radar':
         print('yes')
         #reply_weather_image(event.reply_token)
     #elif '台' in msg or '臺' in msg:
