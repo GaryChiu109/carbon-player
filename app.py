@@ -65,7 +65,7 @@ def reply_weather_image(reply_token):
         )
     )
     #req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers,data=json.dumps(body).encode('utf-8'))
-    #print(req.text)
+    print(radar_img)
     #line_bot_api.reply_message(reply_token, message)
 
 # 處理訊息
