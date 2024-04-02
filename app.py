@@ -57,16 +57,16 @@ def reply_weather_image(reply_token):
     radar_img = radar_json['cwaopendata']['dataset']['resource']['ProductURL']
     radar_time = radar_json['cwaopendata']['dataset']['DateTime'] 
 
-    line_bot_api.reply_message(
-        reply_token,
-        ImageSendMessage(
-            original_content_url = radar_img,
-            preview_image_url = radar_img
-        )
-    )
-    req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers,data=json.dumps(body).encode('utf-8'))
-    print(req.text)
-
+    #line_bot_api.reply_message(
+    #    reply_token,
+    #    ImageSendMessage(
+    #        original_content_url = radar_img,
+    #        preview_image_url = radar_img
+    #    )
+    #)
+    #req = requests.request('POST', 'https://api.line.me/v2/bot/message/reply', headers=headers,data=json.dumps(body).encode('utf-8'))
+    #print(req.text)
+    line_bot_api.reply_message(reply_token, message)
 
 # 處理訊息
 @handler.add(MessageEvent, message=TextMessage)
@@ -77,9 +77,9 @@ def handle_message(event):
     #elif '台' in msg or '臺' in msg:
     #    weather_forecast = current_weather(msg)
     #    line_bot_api.reply_message(event.reply_token, TextSendMessage(text=weather_forecast))
-    #else:
-    #    message = TextSendMessage(text=msg)
-    #    line_bot_api.reply_message(event.reply_token, message)
+    else:
+        message = TextSendMessage(text=msg)
+        line_bot_api.reply_message(event.reply_token, message)
 
 
 @handler.add(PostbackEvent)
