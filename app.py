@@ -123,11 +123,12 @@ def callback():
 @handler.add(MessageEvent, message=TextMessage)
 def handle_message(event):
     if event.message.type == 'location':
-        location = event.message.location
-        # Return the coordinates
-        lat, lon = location.latitude, location.longitude
-        reply = f"The coordinates are: Latitude {lat}, Longitude {lon}"
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="It is a location message."))
+        # location = event.message.location
+        # # Return the coordinates
+        # lat, lon = location.latitude, location.longitude
+        # reply = f"The coordinates are: Latitude {lat}, Longitude {lon}"
+        # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
     elif  event.message.type == 'text':
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
