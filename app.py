@@ -123,12 +123,12 @@ def callback():
 @handler.add(MessageEvent, message=[TextMessage, LocationMessage])
 def handle_message(event):
     if event.message.type == 'location':
-        line_bot_api.reply_message(event.reply_token, TextSendMessage(text="It is a location message."))
-        # location = event.message.location
-        # # Return the coordinates
-        # lat, lon = location.latitude, location.longitude
-        # reply = f"The coordinates are: Latitude {lat}, Longitude {lon}"
-        # line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
+        # line_bot_api.reply_message(event.reply_token, TextSendMessage(text="It is a location message."))
+        location = event.message.location
+        # Return the coordinates
+        lat, lon = location.latitude, location.longitude
+        reply = f"The coordinates are: Latitude {lat}, Longitude {lon}"
+        line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
     elif  event.message.type == 'text':
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
@@ -136,12 +136,6 @@ def handle_message(event):
         else:
             message = TextSendMessage(text=msg)
             line_bot_api.reply_message(event.reply_token, message)
-    # msg = event.message.text
-    # if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
-    #     reply_weather_image(event.reply_token)
-    # else:
-    #     message = TextSendMessage(text=msg)
-    #     line_bot_api.reply_message(event.reply_token, message)
 
 # Other events handling
 @handler.add(PostbackEvent)
