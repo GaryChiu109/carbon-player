@@ -92,10 +92,9 @@ def current_weather(address):
                                 }
         msg = msg_content(town_list2, msg)  # 將訊息改為「大縣市」 
         msg = msg_content(town_list, msg)   # 將訊息改為「鄉鎮區域」 
-        return msg, town_list    # 回傳 msg
+        return msg    # 回傳 msg
     except:
         return msg
-print(current_weather('臺灣臺北市大安區基隆路四段144巷67號'))
             
 # 氣象預報函式
 def forecast(address):
