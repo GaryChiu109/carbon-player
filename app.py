@@ -123,7 +123,7 @@ def callback():
 @handler.add(MessageEvent, message=[TextMessage, LocationMessage])
 def handle_message(event):
     if event.message.type == 'location':
-        address = event.message.address
+        address = event.message.address.replace('台', '臺')
         lat = event.message.latitude
         lon = event.message.longitude
         reply = f"The address is {address}. \nThe latitude is {lat} and the longitude is {lon}."
