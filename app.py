@@ -123,11 +123,10 @@ def callback():
 @handler.add(MessageEvent, message=[TextMessage, LocationMessage])
 def handle_message(event):
     if event.message.type == 'location':
-        # line_bot_api.reply_message(event.reply_token, TextSendMessage(text="It is a location message."))
-        location = event.message.location
-        # Return the coordinates
-        lat, lon = location.latitude, location.longitude
-        reply = f"The coordinates are: Latitude {lat}, Longitude {lon}"
+        address = event.message.address
+        lat = event.message.latitude
+        lon = event.message.longitude
+        reply = f"The address is {address}. \nThe latitude is {lat} and the longitude is {lon}."
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text=reply))
     elif  event.message.type == 'text':
         msg = event.message.text
