@@ -120,7 +120,7 @@ def callback():
     return 'OK'
 
 # Message handling
-@handler.add(MessageEvent, message=TextMessage)
+@handler.add(MessageEvent, message=[TextMessage, LocationMessage])
 def handle_message(event):
     if event.message.type == 'location':
         line_bot_api.reply_message(event.reply_token, TextSendMessage(text="It is a location message."))
