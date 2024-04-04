@@ -26,6 +26,8 @@ handler = WebhookHandler(channel_secret)
 def current_weather(address):
     city_list, town_list, town_list2 = {}, {}, {}
     msg = '找不到氣象資訊。'
+    city = address[:3]
+    district = address[3:6]
 
     def get_data(url):
         data = requests.get(url)
@@ -80,7 +82,7 @@ def current_weather(address):
                                 'prec':round(statistics.mean(city_list[i]['prec']),1)
                                 }
         msg = msg_content(town_list2, msg)  # 將訊息改為「大縣市」 
-        msg = msg_content(town_list, msg)   # 將訊息改為「鄉鎮區域」 
+        msg = msg_content(town_list[district], msg)   # 將訊息改為「鄉鎮區域」 
         return msg    # 回傳 msg
     except:
         return msg
