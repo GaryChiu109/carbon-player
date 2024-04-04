@@ -22,17 +22,6 @@ channel_secret = 'fed72a71f8981ef1dec1e5867df85909'
 line_bot_api = LineBotApi(access_token)
 handler = WebhookHandler(channel_secret)
 
-# Utility functions
-def get_data(url):
-    """Fetches data from the given URL and returns JSON."""
-    response = requests.get(url)
-    response.raise_for_status()  # Raise an exception for HTTP errors
-    return response.json()
-
-def check_data(value):
-    """Checks if the given value is valid (not negative) and returns it."""
-    return float(value) if float(value) >= 0 else None
-
 # Weather functions
 def current_weather(address):
     city_list, town_list, town_list2 = {}, {}, {}
@@ -179,7 +168,6 @@ def aqi(address):
         return msg    # 如果取資料有發生錯誤，直接回傳 msg
 
 def reply_weather_image(reply_token):
-    """Replies with the latest weather radar image."""
     try:
         radar_url = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0058-003?Authorization=rdec-key-123-45678-011121314&format=JSON'
         radar_json = get_data(radar_url)
@@ -212,7 +200,8 @@ def callback():
 def handle_message(event):
     if event.message.type == 'location':
         address = event.message.address.replace('台', '臺')
-        line_bot_api.reply_message(event.reply_token, message=TextSendMessage(text=f'{address}\n\n{current_weather(address)}\n\n{aqi(address)}\n\n{forecast(address)}'))
+        line_bot_api.reply_message(reply_token, message=TextSendMessage(text=f'{address}'))
+        # line_bot_api.reply_message(reply_token, message=TextSendMessage(text=f'{address}\n\n{current_weather(address)}\n\n{aqi(address)}\n\n{forecast(address)}'))
     elif  event.message.type == 'text':
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
