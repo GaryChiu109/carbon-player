@@ -172,8 +172,10 @@ def aqi(address):
 def reply_weather_image(reply_token):
     try:
         radar_url = 'https://opendata.cwa.gov.tw/fileapi/v1/opendataapi/O-A0058-003?Authorization=rdec-key-123-45678-011121314&format=JSON'
-        radar_json = get_data(radar_url)
+        radar = requests.get(radar_url)
+        radar_json = radar.json()
         radar_img = radar_json['cwaopendata']['dataset']['resource']['ProductURL']
+        radar_time = radar_json['cwaopendata']['dataset']['DateTime']
 
         line_bot_api.reply_message(
             reply_token,
