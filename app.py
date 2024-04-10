@@ -164,8 +164,7 @@ def warning(address):
 def reply_air_temperature_image(reply_token):
     try:
         air_temp_url = 'https://cwaopendata.s3.ap-northeast-1.amazonaws.com/Observation/O-A0038-001.jpg'
-        air = requests.get(air_temp_url)
-
+        
         line_bot_api.reply_message(
             reply_token,
             ImageSendMessage(
@@ -195,6 +194,21 @@ def reply_weather_image(reply_token):
     except Exception as e:
         print(f"Error replying with weather image: {e}")
 
+# 農業氣象旬報
+def reply_agriculture_report(reply_token):
+    try:
+        report_url = 'https://cwaopendata.s3.ap-northeast-1.amazonaws.com/Climate/C-A0007-001.pdf'
+        
+        line_bot_api.reply_message(
+            reply_token,
+            ImageSendMessage(
+                original_content_url = report_url,
+                preview_image_url = report_url
+            )
+        )
+    except Exception as e:
+        print(f"Error replying with air temperature image: {e}")
+
 # Route for handling webhook callback
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -221,6 +235,8 @@ def handle_message(event):
             reply_weather_image(event.reply_token)
         if msg == '氣溫分布' or msg == '氣溫分布圖':
             reply_air_temperature_image(event.reply_token)
+        if msg == '農業氣象' or msg == '農業氣象旬報':
+            reply_agriculture_report(event.reply_token)
         else:
             message = TextSendMessage(text=msg)
             line_bot_api.reply_message(event.reply_token, message)
