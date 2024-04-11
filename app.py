@@ -2,7 +2,11 @@ from flask import Flask, request, abort
 import requests
 import statistics
 import os
-
+import requests
+from bs4 import BeautifulSoup
+import json
+import pandas as pd
+from prettytable import PrettyTable 
 from linebot import (
     LineBotApi, WebhookHandler
 )
@@ -209,6 +213,94 @@ def reply_agriculture_report(reply_token):
     except Exception as e:
         print(f"Error replying with air temperature image: {e}")
 
+
+# 成本效益
+def fetch_vegetable_prices():
+    url = 'https://www.twfood.cc/topic/vege/%E6%B0%B4%E7%94%9F%E9%A1%9E'  # 替換成目標頁面的URL
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+
+    # 初始化空列表來存儲爬取的數據
+    data = []
+
+    # 根據HTML結構尋找每個蔬菜的信息區塊
+    vege_blocks = soup.find_all('div', class_='vege_price')
+
+    for block in vege_blocks:
+      name = block.find('h4').text.strip()
+      prices = block.find_all('span', class_='text-price')
+      retail_price = prices[-4].text.strip() if len(prices) > 1 else 'N/A'
+      # 將每條數據作為列表添加到data中
+      data.append([name, retail_price])
+
+      # 將數據轉換為pandas DataFrame
+    df = pd.DataFrame(data, columns=['品項', '本週平均批發價(元/公斤)'])
+    return df
+
+df_vege_prices = fetch_vegetable_prices()
+
+
+    # 可選：將DataFrame保存為CSV文件
+df_vege_prices.to_csv('vege_prices.csv', index=False)
+
+
+def reply_cost_and_effect(event.reply_token):
+    vegetable = input("請輸入菜的名稱: ")
+    fetilizer_amt = float(input('請輸入肥料添加量(以公斤為單位):'))
+    olivine_amt = float(input('請輸入橄欖砂添加量(以公斤為單位):'))
+
+    if vegetable == '空心菜':
+        #cost 
+        ## 農業部的成本表
+        seed_cost = 45453
+        fertiliser = (fetilizer_amt/20)*290
+        wage = 150951
+        pesticides = 2652
+        machine = 9150
+        olivine_price = 13*30*olivine_amt/1000
+        total_cost = (seed_cost + fertiliser + wage + pesticides + machine + olivine_price)
+        total_cost_ex = (seed_cost + fertiliser + wage + pesticides + machine)
+        veg_total_price_ex = 476883
+        net_profit_ex = veg_total_price_ex - total_cost_ex
+        #profit
+    
+    vege_type = df_vege_prices['品項'][0] 
+    price = float(df_vege_prices['本週平均批發價(元/公斤)'][0]) ##當季好蔬菜
+    
+    dry_mass_kgha = 223.0708 + (0.1177986796)*olivine_amt + (0.8516414171)*fetilizer_amt + (-0.0000007937)*(olivine_amt**2) + (-0.0000134670)*olivine_amt*fetilizer_amt + (-0.0000354190)*(fetilizer_amt**2)
+    veg_total_price = price * dry_mass_kgha * 1.5 * 3   # (convert dry mass to mass : 5-10倍) # (crop density conversion : 3 from 農業部) ## (1.5是代表dry mass上升2倍但wet mass上升1.5倍)
+    carbon_sequestered = 0.0000028176 + 0.06567886979596845864 * olivine_amt + -0.00000032024927921929 * olivine_amt**2 + 0.00000000000057864824 * olivine_amt**3
+    carbon_price = carbon_sequestered/1000 * 65*40
+    total_profit = veg_total_price + carbon_price
+    net_profit = total_profit - total_cost
+      
+    # Create a PrettyTable object with column headers
+    myTable = PrettyTable(['項目',"只有添加肥料", "有添加肥料及橄欖砂"]) 
+        
+    # Add rows 
+    myTable.add_row(["種苗費", f"{seed_cost:.2f}", f"{seed_cost:.2f}"]) 
+    myTable.add_row(["肥料費", f"{fertiliser:.2f}", f"{fertiliser:.2f}"]) 
+    myTable.add_row(["人工費", f"{wage:.2f}", f"{wage:.2f}"]) 
+    myTable.add_row(["農藥", f"{pesticides:.2f}", f"{pesticides:.2f}"]) 
+    myTable.add_row(["機械包工費", f"{machine:.2f}", f"{machine:.2f}"]) 
+    myTable.add_row(["橄欖砂價格", "0.00", f"{olivine_price:.2f}"]) 
+    myTable.add_row(["總共成本", f"{total_cost_ex:.2f}", f"{total_cost:.2f}"])
+    myTable.add_row(["空心菜平均批發價", f"{veg_total_price_ex:.2f}", f"{veg_total_price:.2f}"])
+    myTable.add_row(["碳權價格", "0.00", f"{carbon_price:.2f}"])
+    myTable.add_row(["總收益", f"{veg_total_price_ex:.2f}", f"{total_profit:.2f}"])
+    myTable.add_row(["淨收益", f"{net_profit_ex:.2f}", f"{net_profit:.2f}"])
+    
+    print(myTable)
+    line_bot_api.reply_message(
+        reply_token,
+            ImageSendMessage(
+                text=myTable
+            )
+        )
+    else:
+      print("找不到此菜種的資料")
+
+
 # Route for handling webhook callback
 @app.route("/callback", methods=['POST'])
 def callback():
@@ -237,6 +329,8 @@ def handle_message(event):
             reply_air_temperature_image(event.reply_token)
         if msg == '農業氣象' or msg == '農業氣象旬報':
             reply_agriculture_report(event.reply_token)
+        if msg == '成本效益':
+            reply_cost_and_effect(event.reply_token)
         else:
             message = TextSendMessage(text=msg)
             line_bot_api.reply_message(event.reply_token, message)
