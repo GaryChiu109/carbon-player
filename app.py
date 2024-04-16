@@ -206,7 +206,7 @@ def reply_agriculture_report(reply_token):
         line_bot_api.reply_message(
             reply_token,
             TextSendMessage(
-                text = f"農業氣象旬報{report_url}"
+                text = report_url
             )
         )
     except Exception as e:
