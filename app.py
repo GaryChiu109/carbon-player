@@ -198,10 +198,10 @@ def reply_weather_image(reply_token):
     except Exception as e:
         print(f"Error replying with weather image: {e}")
 
-# 農業氣象旬報
+# 1週農業氣象
 def reply_agriculture_report(reply_token):
     try:
-        report_url = 'https://cwaopendata.s3.ap-northeast-1.amazonaws.com/Climate/C-A0007-001.pdf'
+        report_url = 'https://www.cwa.gov.tw/V8/C/L/agriculture.html'
         
         line_bot_api.reply_message(
             reply_token,
@@ -326,7 +326,7 @@ def handle_message(event):
             reply_weather_image(event.reply_token)
         if msg == '氣溫分布' or msg == '氣溫分布圖':
             reply_air_temperature_image(event.reply_token)
-        if msg == '農業氣象' or msg == '農業氣象旬報':
+        if msg == '農業氣象' or msg == '1週農業氣象':
             reply_agriculture_report(event.reply_token)
         if msg == '成本效益':
             reply_cost_and_effect(event.reply_token)
