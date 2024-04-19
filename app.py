@@ -210,7 +210,7 @@ def reply_agriculture_report(reply_token):
             )
         )
     except Exception as e:
-        print(f"Error replying with air temperature image: {e}")
+        print(f"Error replying with agriculture climate forecast: {e}")
 
 
 # 成本效益
