@@ -201,12 +201,12 @@ def reply_weather_image(reply_token):
 # 1週農業氣象
 def reply_agriculture_report(reply_token):
     try:
-        report_url = r'https://www.cwa.gov.tw/V8/C/L/agriculture.html'
+        # report_url = r'https://www.cwa.gov.tw/V8/C/L/agriculture.html'
         
         line_bot_api.reply_message(
             reply_token,
             TextSendMessage(
-                text = report_url
+                text = 'trail message'
             )
         )
     except Exception as e:
