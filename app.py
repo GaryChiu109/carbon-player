@@ -324,7 +324,7 @@ def handle_message(event):
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
             reply_weather_image(event.reply_token)
-        if msg == '氣溫分布' or msg == '氣溫分布圖':
+        if msg == '溫度分布' or msg == '溫度分布圖' or msg == '溫度分佈' or msg == '溫度分佈圖':
             reply_air_temperature_image(event.reply_token)
         if msg == '農業氣象' or msg == '1週農業氣象':
             msg = 'trail message'
