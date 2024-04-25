@@ -404,24 +404,9 @@ def callback():
 def handle_message(event):
     if event.message.type == 'location':
         address = event.message.address.replace('台', '臺')
-        # Fetch weekly weather forecast data
-        forecast_data = weather_forecast_data()
-        # Plot the weather forecast according to the location
-        plot_path = weather_forecast_plot(forecast_data, address)
-        # Prepare the weather information text
-        weather_info = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
-        # Send the weather information text as well as the plot as a reply
-        image_message = ImageSendMessage(
-            original_content_url=plot_path,
-            preview_image_url=plot_path
-        )
-        text_message = TextSendMessage(text=weather_info)
-        line_bot_api.reply_message(event.reply_token, [text_message, image_message])
-        os.remove(plot_path)
-
-        # msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
-        # message = TextSendMessage(text=msg)
-        # line_bot_api.reply_message(event.reply_token, message)
+        msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
+        message = TextSendMessage(text=msg)
+        line_bot_api.reply_message(event.reply_token, message)
     
     elif  event.message.type == 'text':
         msg = event.message.text
