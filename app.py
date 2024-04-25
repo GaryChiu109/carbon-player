@@ -198,20 +198,6 @@ def reply_weather_image(reply_token):
     except Exception as e:
         print(f"Error replying with weather image: {e}")
 
-# 1週農業氣象
-# def reply_agriculture_report(reply_token):
-#     try:
-#         # report_url = r'https://www.cwa.gov.tw/V8/C/L/agriculture.html'
-        
-#         line_bot_api.reply_message(
-#             reply_token,
-#             TextSendMessage(
-#                 text = 'trail message'
-#             )
-#         )
-#     except Exception as e:
-#         print(f"Error replying with agriculture climate forecast: {e}")
-
 
 # 成本效益
 def fetch_vegetable_prices():
@@ -326,10 +312,6 @@ def handle_message(event):
             reply_weather_image(event.reply_token)
         if msg == '溫度分布' or msg == '溫度分布圖' or msg == '溫度分佈' or msg == '溫度分佈圖':
             reply_air_temperature_image(event.reply_token)
-        if msg == '農業氣象' or msg == '1週農業氣象':
-            msg = 'trail message'
-            message = TextSendMessage(text=msg)
-            line_bot_api.reply_message(event.reply_token, message)
         if msg == '成本效益':
             reply_cost_and_effect(event.reply_token)
         else:
