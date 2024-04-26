@@ -166,7 +166,7 @@ def warning(address):
         return msg  # 如果取資料有發生錯誤，直接回傳 msg
 
 # 溫度分布圖
-def reply_air_temperature_image(reply_token):
+def reply_temperature_image(reply_token):
     try:
         air_temp_url = 'https://cwaopendata.s3.ap-northeast-1.amazonaws.com/Observation/O-A0038-001.jpg'
         
@@ -178,7 +178,7 @@ def reply_air_temperature_image(reply_token):
             )
         )
     except Exception as e:
-        print(f"Error replying with air temperature image: {e}")
+        print(f"Error replying with temperature image: {e}")
 
 # 雷達回波圖
 def reply_weather_image(reply_token):
@@ -427,7 +427,7 @@ def handle_message(event):
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
             reply_weather_image(event.reply_token)
         if msg == '溫度分布' or msg == '溫度分布圖' or msg == '溫度分佈' or msg == '溫度分佈圖':
-            reply_air_temperature_image(event.reply_token)
+            reply_temperature_image(event.reply_token)
         if msg == '成本效益':
             reply_cost_and_effect(event.reply_token)
         else:
