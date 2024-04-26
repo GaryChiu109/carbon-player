@@ -165,11 +165,6 @@ def warning(address):
     except:
         return msg  # 如果取資料有發生錯誤，直接回傳 msg
 
-# # 回傳氣象資訊
-# def reply_with_weather_info(event, weather_info):
-#     message = TextSendMessage(text=weather_info)
-#     line_bot_api.reply_message(event.reply_token, message)
-
 # 溫度分布圖
 def reply_air_temperature_image(reply_token):
     try:
@@ -203,6 +198,11 @@ def reply_weather_image(reply_token):
         )
     except Exception as e:
         print(f"Error replying with weather image: {e}")
+
+# # 回傳氣象資訊
+# def reply_with_weather_info(event, weather_info):
+#     message = TextSendMessage(text=weather_info)
+#     line_bot_api.reply_message(event.reply_token, message)
 
 # 未來一週氣象預報
 def weekly_weather_forecast_data():
@@ -304,6 +304,14 @@ def weather_forecast_plot(weekly_weather_forecast_data, address):
     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
         plt.savefig(f.name)
         return f.name
+
+# 回傳未來一週氣象預測
+def send_image_message(reply_token, image_path):
+    image_message = ImageSendMessage(
+        original_content_url = image_path,
+        preview_image_url = image_path
+    )
+    line_bot_api.reply_message(reply_token, image_message)
 
 # 成本效益
 def fetch_vegetable_prices():
@@ -409,11 +417,11 @@ def callback():
 def handle_message(event):
     if event.message.type == 'location':
         address = event.message.address.replace('台', '臺')
-        # weather_info = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
-        # reply_with_weather_info(event, weather_info)
-        msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
-        message = TextSendMessage(text=msg)
-        line_bot_api.reply_message(event.reply_token, message)    
+        plot_image_path = weather_forecast_path(weather_forecast_data(), address)
+        send_image_message(event.reply_token, plot_image_path)
+        # msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
+        # message = TextSendMessage(text=msg)
+        # line_bot_api.reply_message(event.reply_token, message)    
     elif  event.message.type == 'text':
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
