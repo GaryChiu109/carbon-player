@@ -204,114 +204,114 @@ def reply_weather_image(reply_token):
 #     message = TextSendMessage(text=weather_info)
 #     line_bot_api.reply_message(event.reply_token, message)
 
-# 未來一週氣象預報
-def weekly_weather_forecast_data():
-    url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=CWA-371EFA85-E086-45AE-B068-E449E4478D6A&format=JSON'
-    r = requests.get(url)
-    # Parse
-    data = pd.read_json(r.text)
-    data = data.loc['locations', 'records']
-    data = data[0]['location']
+# # 未來一週氣象預報
+# def weekly_weather_forecast_data():
+#     url = 'https://opendata.cwa.gov.tw/api/v1/rest/datastore/F-D0047-091?Authorization=CWA-371EFA85-E086-45AE-B068-E449E4478D6A&format=JSON'
+#     r = requests.get(url)
+#     # Parse
+#     data = pd.read_json(r.text)
+#     data = data.loc['locations', 'records']
+#     data = data[0]['location']
     
-    aggregated_data = {
-        'PoP12h': {}, # 未來12小時降雨機率
-        'T': {}, # 平均溫度
-        'MaxT': {}, # 最高溫度
-        'MinT': {} # 最低溫度
-    }
-    element_lists = [i for i in aggregated_data.keys()]
-    for loc_data in data:
-        loc_name = loc_data['locationName'] # 縣市
-        weather_data = loc_data['weatherElement'] # 項目
-        for element in weather_data:
-          ele_name = element['elementName']
-          if ele_name in element_lists:
-            for entry in element['time']:
-              start_time = entry['startTime'][:10]  # Extract the date
-              value = entry['elementValue'][0]['value']
-              if value.strip():  # Check if value is not empty
-                value = float(value)
-              else:
-                value = 0.0
-              # Store the value for each location, weather element, and start time
-              if start_time not in aggregated_data[ele_name]:
-                aggregated_data[ele_name][start_time] = {}
-              if loc_name not in aggregated_data[ele_name][start_time]:
-                aggregated_data[ele_name][start_time][loc_name] = 0.0
-              aggregated_data[ele_name][start_time][loc_name] += value
+#     aggregated_data = {
+#         'PoP12h': {}, # 未來12小時降雨機率
+#         'T': {}, # 平均溫度
+#         'MaxT': {}, # 最高溫度
+#         'MinT': {} # 最低溫度
+#     }
+#     element_lists = [i for i in aggregated_data.keys()]
+#     for loc_data in data:
+#         loc_name = loc_data['locationName'] # 縣市
+#         weather_data = loc_data['weatherElement'] # 項目
+#         for element in weather_data:
+#           ele_name = element['elementName']
+#           if ele_name in element_lists:
+#             for entry in element['time']:
+#               start_time = entry['startTime'][:10]  # Extract the date
+#               value = entry['elementValue'][0]['value']
+#               if value.strip():  # Check if value is not empty
+#                 value = float(value)
+#               else:
+#                 value = 0.0
+#               # Store the value for each location, weather element, and start time
+#               if start_time not in aggregated_data[ele_name]:
+#                 aggregated_data[ele_name][start_time] = {}
+#               if loc_name not in aggregated_data[ele_name][start_time]:
+#                 aggregated_data[ele_name][start_time][loc_name] = 0.0
+#               aggregated_data[ele_name][start_time][loc_name] += value
                 
-    # Divide each value by 2 after all values have been added
-    for ele_name in aggregated_data:
-        for start_time in aggregated_data[ele_name]:
-          for loc_name in aggregated_data[ele_name][start_time]:
-            aggregated_data[ele_name][start_time][loc_name] /= 2   
+#     # Divide each value by 2 after all values have been added
+#     for ele_name in aggregated_data:
+#         for start_time in aggregated_data[ele_name]:
+#           for loc_name in aggregated_data[ele_name][start_time]:
+#             aggregated_data[ele_name][start_time][loc_name] /= 2   
     
-    return aggregated_data
+#     return aggregated_data
 
-def weather_forecast_plot(weekly_weather_forecast_data, address):
-    location = address[:3]
-    bundles = {
-        'PoP12h': [],
-        'T': [],
-        'MaxT': [],
-        'MinT': []
-    }
-    date_lists = []
+# def weather_forecast_plot(weekly_weather_forecast_data, address):
+#     location = address[:3]
+#     bundles = {
+#         'PoP12h': [],
+#         'T': [],
+#         'MaxT': [],
+#         'MinT': []
+#     }
+#     date_lists = []
 
-    for i in bundles.keys():
-        for element, location_data in aggregated_data.items():
-            if element == i:
-                for date, info in location_data.items():
-                    value = info[location]
-                    bundles[element].append(value)
-                    if date not in date_lists:
-                        date_lists.append(date)
+#     for i in bundles.keys():
+#         for element, location_data in aggregated_data.items():
+#             if element == i:
+#                 for date, info in location_data.items():
+#                     value = info[location]
+#                     bundles[element].append(value)
+#                     if date not in date_lists:
+#                         date_lists.append(date)
 
-    df = pd.DataFrame(bundles)
-    df['Date'] = pd.to_datetime(date_lists)
-    df.set_index('Date', inplace=True)
+#     df = pd.DataFrame(bundles)
+#     df['Date'] = pd.to_datetime(date_lists)
+#     df.set_index('Date', inplace=True)
 
-    # Create two subplots
-    fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+#     # Create two subplots
+#     fig, axes = plt.subplots(2, 1, figsize=(10, 8))
 
-    # Plot temperature-related elements (T, MaxT, MinT) with specified colors
-    temp_columns = ['T', 'MaxT', 'MinT']
-    colors = ['orange', 'red', 'blue']  # Specify colors for each line
-    for i, col in enumerate(temp_columns):
-        df[col].plot(kind='line', marker='o', ax=axes[0], color=colors[i], label=col)
+#     # Plot temperature-related elements (T, MaxT, MinT) with specified colors
+#     temp_columns = ['T', 'MaxT', 'MinT']
+#     colors = ['orange', 'red', 'blue']  # Specify colors for each line
+#     for i, col in enumerate(temp_columns):
+#         df[col].plot(kind='line', marker='o', ax=axes[0], color=colors[i], label=col)
 
-    axes[0].set_xlabel('Date')
-    axes[0].set_ylabel('Temperature (°C)')
-    axes[0].set_title('Temperature Forecast')
-    axes[0].legend()  # Add legend to show which color corresponds to each line
+#     axes[0].set_xlabel('Date')
+#     axes[0].set_ylabel('Temperature (°C)')
+#     axes[0].set_title('Temperature Forecast')
+#     axes[0].legend()  # Add legend to show which color corresponds to each line
 
-    # Set x-axis tick labels and rotate them
-    axes[0].set_xticks(df.index)
-    axes[0].set_xticklabels(df.index.strftime('%Y-%m-%d'), rotation=45)
+#     # Set x-axis tick labels and rotate them
+#     axes[0].set_xticks(df.index)
+#     axes[0].set_xticklabels(df.index.strftime('%Y-%m-%d'), rotation=45)
 
-    # Plot precipitation-related element (PoP12h) with specified color
-    df['PoP12h'].plot(kind='line', marker='o', ax=axes[1], color='lightblue')
-    axes[1].set_xlabel('Date')
-    axes[1].set_ylabel('Percentage')
-    axes[1].set_title('Rainfall Forecast')
+#     # Plot precipitation-related element (PoP12h) with specified color
+#     df['PoP12h'].plot(kind='line', marker='o', ax=axes[1], color='lightblue')
+#     axes[1].set_xlabel('Date')
+#     axes[1].set_ylabel('Percentage')
+#     axes[1].set_title('Rainfall Forecast')
 
-    # Set x-axis tick labels and rotate them
-    axes[1].set_xticks(df.index)
-    axes[1].set_xticklabels(df.index.strftime('%Y-%m-%d'), rotation=45)
+#     # Set x-axis tick labels and rotate them
+#     axes[1].set_xticks(df.index)
+#     axes[1].set_xticklabels(df.index.strftime('%Y-%m-%d'), rotation=45)
 
-    # Adjust layout and display plot
-    plt.tight_layout()
-    with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
-        plt.savefig(f.name)
-        return f.name
+#     # Adjust layout and display plot
+#     plt.tight_layout()
+#     with tempfile.NamedTemporaryFile(suffix='.png', delete=False) as f:
+#         plt.savefig(f.name)
+#         return f.name
 
-# 回傳未來一週氣象預測
-def send_image_message(reply_token, image_path):
-    image_message = ImageSendMessage(
-        original_content_url = image_path,
-        preview_image_url = image_path
-    )
-    line_bot_api.reply_message(reply_token, image_message)
+# # 回傳未來一週氣象預測
+# def send_image_message(reply_token, image_path):
+#     image_message = ImageSendMessage(
+#         original_content_url = image_path,
+#         preview_image_url = image_path
+#     )
+#     line_bot_api.reply_message(reply_token, image_message)
 
 # 成本效益
 def fetch_vegetable_prices():
@@ -417,11 +417,11 @@ def callback():
 def handle_message(event):
     if event.message.type == 'location':
         address = event.message.address.replace('台', '臺')
-        plot_image_path = weather_forecast_path(weather_forecast_data(), address)
-        send_image_message(event.reply_token, plot_image_path)
-        # msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
-        # message = TextSendMessage(text=msg)
-        # line_bot_api.reply_message(event.reply_token, message)    
+        # plot_image_path = weather_forecast_path(weather_forecast_data(), address)
+        # send_image_message(event.reply_token, plot_image_path)
+        msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
+        message = TextSendMessage(text=msg)
+        line_bot_api.reply_message(event.reply_token, message)    
     elif  event.message.type == 'text':
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
