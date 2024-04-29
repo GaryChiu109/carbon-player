@@ -271,15 +271,15 @@ def weather_forecast_description(weekly_weather_forecast_data, address):
         df['Date'] = pd.to_datetime(date_lists)
         df.set_index('Date', inplace=True)
 
-        # Find the maximum value for PoP12h
-        pop_max = df['PoP12h'].max()
-        pop_maxidx = df['PoP12h'].idxmax()
-        # Extract Unix timestamp from the timestamp object
-        pop_maxidx_unix = pop_maxidx.timestamp()
-        pop_maxidx_dt = datetime.fromtimestamp(pop_maxidx_unix)
-        pop_month = pop_maxidx_dt.month
-        pop_day = pop_maxidx_dt.day
-        pop_message = f'未來1週最高降雨機率為{pop_max}預計發生在{pop_month}/{pop_day}'
+        # # Find the maximum value for PoP12h
+        # pop_max = df['PoP12h'].max()
+        # pop_maxidx = df['PoP12h'].idxmax()
+        # # Extract Unix timestamp from the timestamp object
+        # pop_maxidx_unix = pop_maxidx.timestamp()
+        # pop_maxidx_dt = datetime.fromtimestamp(pop_maxidx_unix)
+        # pop_month = pop_maxidx_dt.month
+        # pop_day = pop_maxidx_dt.day
+        # pop_message = f'未來1週最高降雨機率為{pop_max}預計發生在{pop_month}/{pop_day}'
 
         # Find the maximum value for T
         T_max = df['T'].max()
@@ -300,13 +300,13 @@ def weather_forecast_description(weekly_weather_forecast_data, address):
         T_minidx_dt = datetime.fromtimestamp(T_minidx_unix)
         minT_month = T_minidx_dt.month
         minT_day = T_minidx_dt.day
-        minT_message = f'未來1週最低氣溫預計發生於{minT_month}/{minT_day}達{T_min}{celsius_symbol}，'
+        minT_message = f'未來1週最低氣溫預計發生於{minT_month}/{minT_day}達{T_min}{celsius_symbol}'
 
         # Calculate for average temperature
         ave_t = round(df['T'].mean(), 2)
         ave_message = f'未來1週平均氣溫:{ave_t}{celsius_symbol}，'
 
-        description = f'{ave_message}{maxT_message}{minT_message}{pop_message}'.strip('，')
+        description = f'{ave_message}{maxT_message}{minT_message}'.strip('，')
         return description
             
     except Exception as e:
