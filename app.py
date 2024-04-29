@@ -422,7 +422,8 @@ def handle_message(event):
         msg = event.message.text
         if msg.lower() in ['雷達回波圖', '雷達回波', 'radar']:
             reply_weather_image(event.reply_token)
-        if msg in ['溫度分布', '溫度分布圖', '溫度分佈', '溫度分佈圖']:
+        # if msg in ['溫度分布', '溫度分布圖', '溫度分佈', '溫度分佈圖']:
+        if msg == '溫度分布':
             reply_temperature_image(event.reply_token)
         if msg == '成本效益':
             reply_cost_and_effect(event.reply_token)
