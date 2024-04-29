@@ -279,6 +279,7 @@ def weather_forecast_description(weekly_weather_forecast_data, address):
         pop_maxidx_dt = datetime.fromtimestamp(pop_maxidx_unix)
         pop_month = pop_maxidx_dt.month
         pop_day = pop_maxidx_dt.day
+        pop_message = f'未來1週最高降雨機率為{pop_max}預計發生在{pop_month}/{pop_day}'
 
         # Find the maximum value for T
         T_max = df['T'].max()
