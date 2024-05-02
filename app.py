@@ -4,7 +4,7 @@ import statistics
 import os
 import requests
 import json
-import pandas as pd
+#import pandas as pd
 import matplotlib.pyplot as plt
 from prettytable import PrettyTable 
 from linebot import (
