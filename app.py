@@ -301,7 +301,7 @@ def callback():
 def handle_message(event):
     if event.message.type == 'location':
         address = event.message.address.replace('台', '臺')
-        msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}}'
+        msg = f'{address}\n\n{current_weather(address)}\n\n{forecast(address)}\n\n{warning(address)}'
         message = TextSendMessage(text=msg)
         line_bot_api.reply_message(event.reply_token, message)    
     elif  event.message.type == 'text':
