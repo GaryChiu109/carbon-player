@@ -311,8 +311,8 @@ def handle_message(event):
         # if msg in ['溫度分布', '溫度分布圖', '溫度分佈', '溫度分佈圖']:
         if msg == '溫度分布':
             reply_temperature_image(event.reply_token)
-        if msg == '成本效益':
-            reply_cost_and_effect(event.reply_token)
+        #if msg == '成本效益':
+        #    reply_cost_and_effect(event.reply_token)
         else:
             message = TextSendMessage(text=msg)
             line_bot_api.reply_message(event.reply_token, message)
