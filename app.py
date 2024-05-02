@@ -3,7 +3,6 @@ import requests
 import statistics
 import os
 import requests
-# from bs4 import BeautifulSoup
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -122,20 +121,6 @@ def handle_message(event):
         else:
             message = TextSendMessage(text=msg)
             line_bot_api.reply_message(event.reply_token, message)
-
-# Other events handling
-@handler.add(PostbackEvent)
-def handle_postback(event):
-    print(event.postback.data)
-
-@handler.add(MemberJoinedEvent)
-def handle_member_join(event):
-    uid = event.joined.members[0].user_id
-    gid = event.source.group_id
-    profile = line_bot_api.get_group_member_profile(gid, uid)
-    name = profile.display_name
-    message = TextSendMessage(text=f'Welcome, {name}!')
-    line_bot_api.reply_message(event.reply_token, message)
 
 if __name__ == "__main__":
     port = int(os.environ.get('PORT', 5000))
